@@ -7,6 +7,109 @@
   </head>
 
   <body>
-    <p>Welcome to DroTeam!</p>
+    <style media="screen">
+      .welcome_text {
+        font-size: 24pt;
+      }
+
+      .step1 > .header {
+        font-size: 16pt;
+      }
+
+      .step1 > #playersNumberInput {
+        width: 130px;
+      }
+
+      .step2 > .inputs > input {
+        display: list-item;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+
+    <p class="welcome_text">Welcome to DroTeam!</p>
+
+    <div class="step1">
+      <div class="header">Wanna play a little game?</div>
+      <input id="playersNumberInput" type="number" min=1 max=3 name="playersNumber" value="" placeholder="Input player's number">
+      <button id="startBtn" type="button" name="start">Start!</button>
+    </div>
+
+    <div class="step2 hidden">
+      Input player names:
+      <div class="inputs"></div>
+      <button id="acceptNamesBtn" type="button">We are ready!</button>
+    </div>
+
+    <div class="step3 hidden">
+      <div class="players_table"></div>
+      <div class="score_input_field">
+        <input type="number" name="player_score" value="0" min=0 max=180>
+        <button id="applyPlayerScore" type="button">Apply!</button>
+      </div>
+    </div>
+
+    <div class="templates hidden">
+      <div class="playerNameInput">
+        <input id="rawPlayerNameInput" type="text" value="">
+      </div>
+
+      <div id="playerRowItem" class="player_row">
+        <span class="player_name">
+          Player Name
+        </span>
+        <span class="player_score">
+          0
+        </span>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      document.getElementById('startBtn').addEventListener('click', function(ev) {
+        ev.preventDefault();
+        hideElementByClassName('step1');
+        playersNumber = document.getElementById('playersNumberInput').value;
+        showPlayerNameInputs(playersNumber);
+        showElementByClassName('step2');
+      })
+
+      document.getElementById('acceptNamesBtn').addEventListener('click', function(ev) {
+        ev.preventDefault();
+        hideElementByClassName('step2')
+        let playerNamesList = document.querySelector('.step2 .inputs').children
+        applyPlayerNames(playerNamesList)
+        showElementByClassName('step3')
+      })
+
+      function showPlayerNameInputs(playersNumber) {
+        let inputs = document.querySelector('.step2 .inputs');
+        for(let number = 0; number < playersNumber; number++) {
+          let clonned = document.getElementById('rawPlayerNameInput').cloneNode(true);
+          clonned.id = 'player_' + number;
+          clonned.value = 'Player ' + (number + 1);
+          inputs.appendChild(clonned);
+        }
+      }
+
+      function applyPlayerNames(playerNamesList) {
+        let playersTable = document.querySelector('.step3 .players_table')
+        for(let idx = 0; idx < playerNamesList.length; idx++) {
+          let clonned = document.getElementById('playerRowItem').cloneNode(true)
+          clonned.id = playerNamesList[idx].id
+          clonned.querySelector('span.player_name').textContent = playerNamesList[idx].value
+          playersTable.appendChild(clonned)
+        }
+      }
+
+      function hideElementByClassName(className) {
+        document.getElementsByClassName(className)[0].classList.add('hidden');
+      }
+
+      function showElementByClassName(className) {
+        document.getElementsByClassName(className)[0].classList.remove('hidden');
+      }
+    </script>
   </body>
 </html>
