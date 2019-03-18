@@ -62,9 +62,9 @@
         <div class="col-6">
           <ul class="players_table list-group"></ul>
           <div class="score_input_field input-group mt-4">
-            <input class="form-control" type="number" name="player_score" value="0" min=0 max=180 inputmode="numeric" pattern="[0-9]*">
+            <input class="form-control player_score" type="number" value="0" min=0 max=180 inputmode="numeric" pattern="[0-9]*">
             <div class="input-group-append">
-              <button id="applyPlayerScore" class="btn btn-success" type="button">Apply!</button>
+              <button id="applyPlayerScore" class="btn btn-success" data-player-idx="0" type="button">Apply!</button>
             </div>
           </div>
         </div>
@@ -80,7 +80,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text player_name">Player 1</span>
             </div>
-            <input type="text" value="0" class="form-control" disabled>
+            <input type="number" value="0" class="form-control" disabled data-player-order="-1" data-players-number="0">
           </div>
         </li>
       </div>
@@ -103,6 +103,55 @@
         showElementByClassName('step3')
       })
 
+      document.getElementById('applyPlayerScore').addEventListener('click', function(ev) {
+        ev.preventDefault();
+        let currentPlayerScore = parseInt(document.querySelector('.step3 input.player_score').value)
+        if (currentPlayerScore > 180) {
+          alert('Cannot be greater than 180')
+          return
+        }
+
+        let playersList = document.querySelector('.step3 ul').children
+        let currentPlayerIdx = parseInt(ev.target.getAttribute('data-player-idx'))
+        let currentPlayer = playersList[currentPlayerIdx].getElementsByTagName('input')[0]
+
+        let playersNumber = playersList.length
+        let currentPlayerValue = parseInt(currentPlayer.value)
+
+        if(currentPlayerValue + currentPlayerScore > 501) {
+          currentPlayerScore = 0
+          alert('Total cannot be greater than 501')
+        } else if (currentPlayerValue + currentPlayerScore == 501) {
+          alert('Congratulations! Current player reached 501!')
+        }
+        currentPlayer.value = currentPlayerValue + currentPlayerScore
+
+        let nextPlayer = getNextPlayer(currentPlayerIdx, playersNumber)
+        let nextPlayerIdx = parseInt(nextPlayer.getAttribute('data-player-order'))
+        let nextPlayerValue = parseInt(nextPlayer.value)
+
+        if (nextPlayerValue == 501) {
+          nextPlayer = getNextPlayer(nextPlayerIdx, playersNumber)
+          nextPlayerIdx = parseInt(nextPlayer.getAttribute('data-player-order'))
+        }
+
+        ev.target.setAttribute('data-player-idx', nextPlayerIdx)
+        currentPlayer.classList.remove('is-valid')
+        nextPlayer.classList.add('is-valid')
+        document.querySelector('.step3 input.player_score').value = 0
+      })
+
+      function getNextPlayer(currentPlayerIdx, playersNumber) {
+        let nextPlayerIdx = -1
+        if (currentPlayerIdx == (playersNumber - 1)) {
+          nextPlayerIdx = 0
+        } else {
+          nextPlayerIdx = currentPlayerIdx + 1
+        }
+
+        return document.querySelector('.step3 input[data-player-order="' + nextPlayerIdx + '"]')
+      }
+
       function showPlayerNameInputs(playersNumber) {
         let inputs = document.querySelector('.step2 .inputs');
         for(let number = 0; number < playersNumber; number++) {
@@ -115,9 +164,13 @@
 
       function applyPlayerNames(playerNamesList) {
         let playersTable = document.querySelector('.step3 .players_table')
-        for(let idx = 0; idx < playerNamesList.length; idx++) {
+        let playersNumber = playerNamesList.length
+        for(let idx = 0; idx < playersNumber; idx++) {
           let clonned = document.getElementById('playerRowItem').cloneNode(true)
           clonned.id = playerNamesList[idx].id
+          let clonnedInput = clonned.getElementsByTagName('input')[0]
+          clonnedInput.setAttribute('data-player-order', idx)
+          clonnedInput.setAttribute('data-players-number', playersNumber - 1)
           clonned.querySelector('span.player_name').textContent = playerNamesList[idx].value
           if(idx == 0) {
             clonned.querySelector('input').classList.add('is-valid')
