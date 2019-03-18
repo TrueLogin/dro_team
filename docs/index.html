@@ -3,24 +3,13 @@
 <html lang="en">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <title>DroTeam</title>
   </head>
 
   <body>
-    <style media="screen">
-      .welcome_text {
-        font-size: 24pt;
-      }
-
-      .step1 > .header {
-        font-size: 16pt;
-      }
-
-      .step1 > #playersNumberInput {
-        width: 130px;
-      }
-
-      .step2 > .inputs > input {
+    <style>
+      .step2 .inputs input {
         display: list-item;
       }
 
@@ -29,40 +18,71 @@
       }
     </style>
 
-    <p class="welcome_text">Welcome to DroTeam!</p>
-
-    <div class="step1">
-      <div class="header">Wanna play a little game?</div>
-      <input id="playersNumberInput" type="number" min=1 max=3 name="playersNumber" value="" placeholder="Input player's number">
-      <button id="startBtn" type="button" name="start">Start!</button>
-    </div>
-
-    <div class="step2 hidden">
-      Input player names:
-      <div class="inputs"></div>
-      <button id="acceptNamesBtn" type="button">We are ready!</button>
-    </div>
-
-    <div class="step3 hidden">
-      <div class="players_table"></div>
-      <div class="score_input_field">
-        <input type="number" name="player_score" value="0" min=0 max=180>
-        <button id="applyPlayerScore" type="button">Apply!</button>
-      </div>
-    </div>
-
-    <div class="templates hidden">
-      <div class="playerNameInput">
-        <input id="rawPlayerNameInput" type="text" value="">
+    <div class="container">
+      <div class="row step1">
+        <div class="col-12">
+          <h2 class="welcome_text">Welcome to DroTeam!</h2>
+        </div>
+        <div class="col-12">
+          <h3 class="header">Wanna play a little game?</h3>
+          <div class="input-group col-6">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Players number:</label>
+            </div>
+            <select name="" class="form-control" id="playersNumberInput">
+              <option selected value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+            <div class="input-group-append">
+              <button id="startBtn" class="btn btn-primary" type="button" name="start">Start!</button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div id="playerRowItem" class="player_row">
-        <span class="player_name">
-          Player Name
-        </span>
-        <span class="player_score">
-          0
-        </span>
+      <div class="row step2 hidden">
+        <div class="col-12">
+          <h2 class="welcome_text">Input players names</h2>
+        </div>
+        <div class="col-12">
+          <div class="inputs col-6"></div>
+          <div class="w-100"></div>
+          <div class="col-12 mt-4">
+            <button id="acceptNamesBtn" class="btn btn-info" type="button">We are ready!</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row step3 hidden">
+        <div class="col-12">
+          <h2 class="welcome_text">Scores table</h2>
+        </div>
+        <div class="col-6">
+          <ul class="players_table list-group"></ul>
+          <div class="score_input_field input-group mt-4">
+            <input class="form-control" type="number" name="player_score" value="0" min=0 max=180>
+            <div class="input-group-append">
+              <button id="applyPlayerScore" class="btn btn-success" type="button">Apply!</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="templates hidden">
+        <div class="playerNameInput">
+          <input class="form-control" id="rawPlayerNameInput" type="text" value="">
+        </div>
+
+        <li id="playerRowItem" class="player_row list-group-item">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text player_name">Player 1</span>
+            </div>
+            <input type="text" value="0" class="form-control" disabled>
+          </div>
+        </li>
       </div>
     </div>
 
@@ -99,6 +119,9 @@
           let clonned = document.getElementById('playerRowItem').cloneNode(true)
           clonned.id = playerNamesList[idx].id
           clonned.querySelector('span.player_name').textContent = playerNamesList[idx].value
+          if(idx == 0) {
+            clonned.querySelector('input').classList.add('is-valid')
+          }
           playersTable.appendChild(clonned)
         }
       }
