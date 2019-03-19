@@ -81,7 +81,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text player_name">Player 1</span>
             </div>
-            <input type="number" value="0" class="form-control" disabled data-player-order="-1" data-players-number="0">
+            <input type="number" value="501" class="form-control" disabled data-player-order="-1" data-players-number="0">
           </div>
         </li>
       </div>
@@ -113,7 +113,12 @@
 
       document.getElementById('applyPlayerScore').addEventListener('click', function(ev) {
         ev.preventDefault();
-        let currentPlayerScore = parseInt(document.querySelector('.step3 input.player_score').value)
+        let currentScore = document.querySelector('.step3 input.player_score').value
+        if (!currentScore) {
+          alert('Enter something plz')
+          return
+        }
+        let currentPlayerScore = parseInt(currentScore)
         if (currentPlayerScore > 180) {
           alert('Cannot be greater than 180')
           return
@@ -126,19 +131,23 @@
         let playersNumber = playersList.length
         let currentPlayerValue = parseInt(currentPlayer.value)
 
-        if(currentPlayerValue + currentPlayerScore > 501) {
+        if(currentPlayerValue - currentPlayerScore < 0) {
           currentPlayerScore = 0
-          alert('Total cannot be greater than 501')
-        } else if (currentPlayerValue + currentPlayerScore == 501) {
-          alert('Congratulations! Current player reached 501!')
+          alert('Total cannot be less than 0')
+        } else if (currentPlayerValue - currentPlayerScore == 0) {
+          alert(`Congratulations! Current player threw 501! Done in ${localStorage.clickcount} laps!`)
         }
-        currentPlayer.value = currentPlayerValue + currentPlayerScore
+        currentPlayer.value = currentPlayerValue - currentPlayerScore
+
+        if (0 < currentPlayer.value && currentPlayer.value < 75) {
+          alert(`${currentPlayer.value} left to win!`)
+        }
 
         let nextPlayer = getNextPlayer(currentPlayerIdx, playersNumber)
         let nextPlayerIdx = parseInt(nextPlayer.getAttribute('data-player-order'))
         let nextPlayerValue = parseInt(nextPlayer.value)
 
-        if (nextPlayerValue == 501) {
+        if (nextPlayerValue == 0) {
           nextPlayer = getNextPlayer(nextPlayerIdx, playersNumber)
           nextPlayerIdx = parseInt(nextPlayer.getAttribute('data-player-order'))
         }
