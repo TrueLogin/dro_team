@@ -51,6 +51,7 @@
           <div class="w-100"></div>
           <div class="col-12 mt-4">
             <button id="acceptNamesBtn" class="btn btn-info" type="button">We are ready!</button>
+            <button id="backBtn" class="btn btn-info" type="button">Back!!111!11</button>
           </div>
         </div>
       </div>
@@ -62,7 +63,7 @@
         <div class="col-6">
           <ul class="players_table list-group"></ul>
           <div class="score_input_field input-group mt-4">
-            <input class="form-control player_score" type="number" value="0" min=0 max=180 inputmode="numeric" pattern="[0-9]*">
+            <input class="form-control player_score" type="number" value="0" min=0 max=180 inputmode="numeric" pattern="[0-9]*" onfocus="this.value=''">
             <div class="input-group-append">
               <button id="applyPlayerScore" class="btn btn-success" data-player-idx="0" type="button">Apply!</button>
             </div>
@@ -84,6 +85,7 @@
           </div>
         </li>
       </div>
+      <div id="lapCounter"></div>
     </div>
 
     <script type="text/javascript">
@@ -101,6 +103,12 @@
         let playerNamesList = document.querySelector('.step2 .inputs').children
         applyPlayerNames(playerNamesList)
         showElementByClassName('step3')
+      })
+
+      document.getElementById('backBtn').addEventListener('click', function(ev) {
+        ev.preventDefault()
+        hideElementByClassName('step2')
+        showElementByClassName('step1')
       })
 
       document.getElementById('applyPlayerScore').addEventListener('click', function(ev) {
@@ -145,6 +153,7 @@
         let nextPlayerIdx = -1
         if (currentPlayerIdx == (playersNumber - 1)) {
           nextPlayerIdx = 0
+          updateLapCounter()
         } else {
           nextPlayerIdx = currentPlayerIdx + 1
         }
@@ -154,6 +163,9 @@
 
       function showPlayerNameInputs(playersNumber) {
         let inputs = document.querySelector('.step2 .inputs');
+        while (inputs.firstChild) {
+          inputs.removeChild(inputs.firstChild);
+        }
         for(let number = 0; number < playersNumber; number++) {
           let clonned = document.getElementById('rawPlayerNameInput').cloneNode(true);
           clonned.id = 'player_' + number;
@@ -163,6 +175,7 @@
       }
 
       function applyPlayerNames(playerNamesList) {
+        initClickCountStorage()
         let playersTable = document.querySelector('.step3 .players_table')
         let playersNumber = playerNamesList.length
         for(let idx = 0; idx < playersNumber; idx++) {
@@ -177,6 +190,23 @@
           }
           playersTable.appendChild(clonned)
         }
+      }
+
+      function initClickCountStorage() {
+        if(typeof(Storage) !== "undefined") {
+          localStorage.clickcount = 0;
+
+          updateLapCounter(localStorage.clickcount);
+        }
+      }
+
+      function updateLapCounter(number = 0) {
+        if (localStorage.clickcount) {
+          localStorage.clickcount = Number(localStorage.clickcount)+1;
+        } else {
+          localStorage.clickcount = 1;
+        }
+        document.getElementById('lapCounter').innerHTML = "Lap: " + localStorage.clickcount;
       }
 
       function hideElementByClassName(className) {
