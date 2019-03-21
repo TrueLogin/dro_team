@@ -28,7 +28,7 @@
         </div>
         <div class="col-12">
           <h3 class="header">Wanna play a little game?</h3>
-          <div class="input-group">
+          <div class="input-group mt-4">
             <div class="input-group-prepend">
               <span class="input-group-text">Players number:</label>
             </div>
@@ -49,12 +49,12 @@
         <div class="col-12">
           <h2 class="welcome_text">Input players names</h2>
         </div>
-        <div class="col-12">
+        <div class="col-12 mt-4">
           <div class="inputs"></div>
           <div class="w-100"></div>
-          <div class="col-12 mt-4">
+          <div class="mt-4 btn-group btn-block">
+            <button id="backBtn" class="btn btn-dark" type="button">Back!!111!11</button>
             <button id="acceptNamesBtn" class="btn btn-info" type="button">We are ready!</button>
-            <button id="backBtn" class="btn btn-info" type="button">Back!!111!11</button>
           </div>
         </div>
       </div>
@@ -67,7 +67,7 @@
           </h2>
         </div>
         <div class="col-4">
-          <button type="button" id="resetGameBtn" class="btn btn-outline-primary mt-2 float-right">Replay!</button>
+          <button type="button" id="resetGameBtn" class="btn btn-primary mt-2 float-right">Replay!</button>
         </div>
         <div class="col-12 mt-2">
           <ul class="players_table list-group"></ul>
@@ -82,7 +82,7 @@
 
       <div class="templates hidden">
         <div class="playerNameInput">
-          <input class="form-control" id="rawPlayerNameInput" type="text" value="">
+          <input class="form-control" id="rawPlayerNameInput" type="text" value="" onfocus="this.value=''">
         </div>
 
         <li id="playerRowItem" class="player_row list-group-item">
@@ -174,10 +174,20 @@
           return
         }
 
+        let applyBtn = document.getElementById('applyPlayerScore')
         let playersList = document.querySelector('.step3 ul').children
+
         for (let idx = 0; idx < playersList.length; idx++) {
-          playersList[idx].querySelector('input').value = 501
+          let playerInput = playersList[idx].querySelector('input')
+          if(idx == 0) {
+            playerInput.classList.add('is-valid')
+          } else if (idx == parseInt(applyBtn.getAttribute('data-player-idx'))) {
+            playerInput.classList.remove('is-valid')
+          }
+          playerInput.value = 501
         }
+
+        applyBtn.setAttribute('data-player-idx', 0)
         initClickCountStorage()
       })
 
