@@ -60,10 +60,16 @@
       </div>
 
       <div class="row step3 hidden">
-        <div class="col-12">
-          <h2 class="welcome_text">Scores table</h2>
+        <div class="col-8">
+          <h2 class="welcome_text mb-0">
+            Scores
+            <small id="lapCounter" class="text-muted"></small>
+          </h2>
         </div>
-        <div class="col-12">
+        <div class="col-4">
+          <button type="button" id="resetGameBtn" class="btn btn-outline-primary mt-2 float-right">Replay!</button>
+        </div>
+        <div class="col-12 mt-2">
           <ul class="players_table list-group"></ul>
           <div class="score_input_field input-group mt-4">
             <input class="form-control player_score" type="number" value="0" min=0 max=180 inputmode="numeric" pattern="[0-9]*" onfocus="this.value=''">
@@ -88,7 +94,6 @@
           </div>
         </li>
       </div>
-      <div id="lapCounter"></div>
     </div>
 
     <script type="text/javascript">
@@ -161,6 +166,21 @@
         document.querySelector('.step3 input.player_score').value = 0
       })
 
+      document.getElementById('resetGameBtn').addEventListener('click', function(ev) {
+        ev.preventDefault();
+        let resetGame = confirm('Are you sure? You\'ll lose current progress!')
+
+        if(!resetGame) {
+          return
+        }
+
+        let playersList = document.querySelector('.step3 ul').children
+        for (let idx = 0; idx < playersList.length; idx++) {
+          playersList[idx].querySelector('input').value = 501
+        }
+        initClickCountStorage()
+      })
+
       function getNextPlayer(currentPlayerIdx, playersNumber) {
         let nextPlayerIdx = -1
         if (currentPlayerIdx == (playersNumber - 1)) {
@@ -218,7 +238,7 @@
         } else {
           localStorage.clickcount = 1;
         }
-        document.getElementById('lapCounter').innerHTML = "Lap: " + localStorage.clickcount;
+        document.getElementById('lapCounter').innerHTML = '(Lap: ' + localStorage.clickcount + ')';
       }
 
       function hideElementByClassName(className) {
