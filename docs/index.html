@@ -106,14 +106,14 @@
         <div class="col-12 mt-2">
           <div class="table-responsive">
             <table class="table table-sm history">
-              <thead class="thead-light">
-                <tr>
+              <thead>
+                <tr class="table-secondary">
                   <th>Lap #</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td class="text-center">1</td>
+                  <td class="text-center table-secondary">1</td>
                 </tr>
               </tbody>
             </table>
@@ -242,6 +242,7 @@
 
         applyBtn.setAttribute('data-player-idx', 0)
         initClickCountStorage()
+        insertEndGameRowToHistory()
       })
 
       function getNextPlayer(currentPlayerIdx, playersNumber) {
@@ -342,6 +343,7 @@
         let td = tr.insertCell(0)
 
         td.classList.add('text-center')
+        td.classList.add('table-secondary')
         td.textContent = lapNumber
 
         // +1 is for lap number cell
@@ -350,6 +352,20 @@
           td.classList.add('text-center')
           td.textContent = '-'
         }
+      }
+
+      function insertEndGameRowToHistory() {
+        let historyTable = document.querySelector('.step3 table.history tbody')
+        let colspan = document.querySelector('.step3 ul').children.length + 1
+
+        let tr = historyTable.insertRow(0)
+        let td = tr.insertCell(0)
+        td.setAttribute('colspan', colspan)
+        td.textContent = 'Game finished'
+        td.classList.add('text-center')
+        td.classList.add('table-secondary')
+
+        insertHistoryRow(1)
       }
 
       function hideElementByClassName(className) {
