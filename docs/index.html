@@ -113,7 +113,7 @@
               </thead>
               <tbody>
                 <tr>
-                  <td class="text-center">00</td>
+                  <td class="text-center">1</td>
                 </tr>
               </tbody>
             </table>
@@ -142,7 +142,7 @@
             </tr>
           </thead>
           <tbody>
-            <td class="text-center"></td>
+            <td class="text-center">-</td>
           </tbody>
         </table>
       </div>
@@ -198,6 +198,7 @@
           alert(`Congratulations! Current player threw 501! Done in ${localStorage.clickcount} laps!`)
         }
         currentPlayer.value = currentPlayerValue - currentPlayerScore
+        addScoreToHistory(currentPlayerIdx, currentPlayerScore)
 
         if (0 < currentPlayer.value && currentPlayer.value < 75) {
           alert(`${currentPlayer.value} left to win!`)
@@ -309,11 +310,16 @@
           let clonnedTd = document.querySelector('.templates.hidden td').cloneNode(true)
 
           clonnedTh.textContent = playersList[idx].value
-          clonnedTd.textContent = '-'
 
           historyTable.querySelector('thead tr').appendChild(clonnedTh)
           historyTable.querySelector('tbody tr').appendChild(clonnedTd)
         }
+      }
+
+      function addScoreToHistory(playerIdx, playerScore) {
+        let historyTable = document.querySelector('.step3 table.history')
+        let historyCells = historyTable.querySelector('tbody').children[0].children
+        historyCells[playerIdx + 1].textContent = playerScore // +1 for lap number cell
       }
 
       function updateLapCounter(number = 0) {
@@ -323,6 +329,27 @@
           localStorage.clickcount = 1;
         }
         document.getElementById('lapCounter').innerHTML = '(Lap: ' + localStorage.clickcount + ')';
+        if (Number(localStorage.clickcount) > 1) {
+          insertHistoryRow(localStorage.clickcount)
+        }
+      }
+
+      function insertHistoryRow(lapNumber) {
+        let historyTable = document.querySelector('.step3 table.history tbody')
+        let playersNumber = document.querySelector('.step3 ul').children.length
+
+        let tr = historyTable.insertRow(0)
+        let td = tr.insertCell(0)
+
+        td.classList.add('text-center')
+        td.textContent = lapNumber
+
+        // +1 is for lap number cell
+        for (let idx = 0; idx < playersNumber; idx++) {
+          let td = tr.insertCell(idx + 1)
+          td.classList.add('text-center')
+          td.textContent = '-'
+        }
       }
 
       function hideElementByClassName(className) {
