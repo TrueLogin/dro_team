@@ -12,6 +12,21 @@
 
   <body>
     <style>
+      .header-2 {
+        font-size: 2rem;
+        font-weight: 500;
+      }
+
+      .header-3 {
+        font-size: 1.75rem;
+        font-weight: 500;
+      }
+
+      .header-5 {
+        font-size: 1.25rem;
+        font-weight: 500;
+      }
+
       .step2 .inputs input {
         display: list-item;
       }
@@ -24,10 +39,10 @@
     <div class="container-fluid">
       <div class="row step1">
         <div class="col-12">
-          <h2 class="welcome_text">Welcome to DroTeam!</h2>
+          <div class="header-2">Welcome to DroTeam!</div>
         </div>
         <div class="col-12">
-          <h3 class="header">Wanna play a little game?</h3>
+          <div class="header-3">Wanna play a little game?</div>
           <div class="input-group mt-4">
             <div class="input-group-prepend">
               <span class="input-group-text">Players number:</label>
@@ -47,7 +62,7 @@
 
       <div class="row step2 hidden">
         <div class="col-12">
-          <h2 class="welcome_text">Input players names</h2>
+          <div class="header-2">Input players names</div>
         </div>
         <div class="col-12 mt-4">
           <div class="inputs"></div>
@@ -61,10 +76,10 @@
 
       <div class="row step3 hidden">
         <div class="col-8">
-          <h2 class="welcome_text mb-0">
+          <div class="header-2 mb-0">
             Scores
             <small id="lapCounter" class="text-muted"></small>
-          </h2>
+          </div>
         </div>
         <div class="col-4">
           <button type="button" id="resetGameBtn" class="btn btn-primary mt-2 float-right">Replay!</button>
@@ -76,6 +91,32 @@
             <div class="input-group-append">
               <button id="applyPlayerScore" class="btn btn-success" data-player-idx="0" type="button">Apply!</button>
             </div>
+          </div>
+        </div>
+
+        <div class="w-100 mt-5"></div>
+        <div class="w-100 mt-5"></div>
+
+        <div class="col-12">
+          <div class="header-5">
+            Lap history
+          </div>
+        </div>
+
+        <div class="col-12 mt-2">
+          <div class="table-responsive">
+            <table class="table table-sm history">
+              <thead class="thead-light">
+                <tr>
+                  <th>Lap #</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="text-center">00</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -93,6 +134,17 @@
             <input type="number" value="501" class="form-control" disabled data-player-order="-1" data-players-number="0">
           </div>
         </li>
+
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <td class="text-center"></td>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -220,18 +272,24 @@
         initClickCountStorage()
         let playersTable = document.querySelector('.step3 .players_table')
         let playersNumber = playerNamesList.length
+
         for(let idx = 0; idx < playersNumber; idx++) {
           let clonned = document.getElementById('playerRowItem').cloneNode(true)
-          clonned.id = playerNamesList[idx].id
           let clonnedInput = clonned.getElementsByTagName('input')[0]
+
+          clonned.id = playerNamesList[idx].id
           clonnedInput.setAttribute('data-player-order', idx)
           clonnedInput.setAttribute('data-players-number', playersNumber - 1)
           clonned.querySelector('span.player_name').textContent = playerNamesList[idx].value
+
           if(idx == 0) {
             clonned.querySelector('input').classList.add('is-valid')
           }
+
           playersTable.appendChild(clonned)
         }
+
+        initHistoryTable(playerNamesList)
       }
 
       function initClickCountStorage() {
@@ -239,6 +297,22 @@
           localStorage.clickcount = 0;
 
           updateLapCounter(localStorage.clickcount);
+        }
+      }
+
+      function initHistoryTable(playersList) {
+        let historyTable = document.querySelector('.step3 table.history')
+        let playersNumber = playersList.length
+
+        for (let idx = 0; idx < playersNumber; idx++) {
+          let clonnedTh = document.querySelector('.templates.hidden th').cloneNode(true)
+          let clonnedTd = document.querySelector('.templates.hidden td').cloneNode(true)
+
+          clonnedTh.textContent = playersList[idx].value
+          clonnedTd.textContent = '-'
+
+          historyTable.querySelector('thead tr').appendChild(clonnedTh)
+          historyTable.querySelector('tbody tr').appendChild(clonnedTd)
         }
       }
 
