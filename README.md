@@ -15,8 +15,8 @@ Are you curious? Of course you are! Just give it a [try](https://truelogin.githu
 ---
 
 Roadmap:
-- [ ] Add quick game (reach out 301)
-- [ ] Add long game (reach out 701)
+- [x] Add quick game (reach out 301)
+- [x] Add long game (reach out 701)
 - [ ] Fix all of the bugs
 - [ ] Make application great again
 - [ ] ~~Add monetization~~

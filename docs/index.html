@@ -45,7 +45,7 @@
           <div class="header-3">Wanna play a little game?</div>
           <div class="input-group mt-4">
             <div class="input-group-prepend">
-              <span class="input-group-text">Players number:</label>
+              <span class="input-group-text">Players:</label>
             </div>
             <select name="" class="form-control" id="playersNumberInput">
               <option selected value="2">2</option>
@@ -53,9 +53,19 @@
               <option value="4">4</option>
               <option value="5">5</option>
             </select>
-            <div class="input-group-append">
-              <button id="startBtn" class="btn btn-primary" type="button" name="start">Start!</button>
+          </div>
+          <div class="input-group mt-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Duration:</label>
             </div>
+            <select name="" class="form-control" id="gameDuration">
+              <option value="301">Short (301)</option>
+              <option selected value="501">Mid (501)</option>
+              <option value="701">Long (701)</option>
+            </select>
+          </div>
+          <div class="mt-4">
+            <button id="startBtn" class="btn btn-primary btn-block" type="button" name="start">Start!</button>
           </div>
         </div>
       </div>
@@ -87,25 +97,31 @@
         <div class="col-12 mt-2">
           <ul class="players_table list-group"></ul>
           <div class="score_input_field input-group mt-4">
-            <input class="form-control player_score" type="number" value="0" min=0 max=180 inputmode="numeric" pattern="[0-9]*" onfocus="this.value=''">
+            <input class="form-control thrown-value" type="number" value="0" min=0 max=180 inputmode="numeric" pattern="[0-9]*" onfocus="this.value=''">
             <div class="input-group-append">
-              <button id="applyPlayerScore" class="btn btn-success" data-player-idx="0" type="button">Apply!</button>
+              <button id="applyPlayerScoreBtn" class="btn btn-success" data-player-idx="0" type="button">Apply!</button>
             </div>
+          </div>
+          <div class="mt-2 border border-dark rounded">
+            <button id="threwTooMuchBtn" type="button" class="btn btn-light btn-block">Threw too much!</button>
           </div>
         </div>
 
         <div class="w-100 mt-5"></div>
         <div class="w-100 mt-5"></div>
 
-        <div class="col-12">
+        <div class="col-8">
           <div class="header-5">
             Lap history
           </div>
         </div>
+        <div class="col-4">
+          <button id="showHideHistory" type="button" class="btn btn-link float-right">Hide</button>
+        </div>
 
-        <div class="col-12 mt-2">
-          <div class="table-responsive">
-            <table class="table table-sm history">
+        <div class="col-12 mt-2 table-history-wrapper">
+          <div class="table-responsive border-right border-bottom mb-2">
+            <table class="table table-sm history mb-0">
               <thead>
                 <tr class="table-secondary">
                   <th>Lap #</th>
@@ -131,7 +147,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text player_name">Player 1</span>
             </div>
-            <input type="number" value="501" class="form-control" disabled data-player-order="-1" data-players-number="0">
+            <input type="number" value="0" class="form-control" disabled data-player-order="-1" data-players-number="0">
           </div>
         </li>
 
@@ -171,34 +187,85 @@
         showElementByClassName('step1')
       })
 
-      document.getElementById('applyPlayerScore').addEventListener('click', function(ev) {
+      document.getElementById('applyPlayerScoreBtn').addEventListener('click', function(ev) {
         ev.preventDefault();
-        let currentScore = document.querySelector('.step3 input.player_score').value
-        if (!currentScore) {
+        let thrownValue = document.querySelector('.step3 input.thrown-value').value
+        if (!thrownValue) {
           alert('Enter something plz')
           return
         }
-        let currentPlayerScore = parseInt(currentScore)
-        if (currentPlayerScore > 180) {
+        thrownValue = parseInt(thrownValue)
+        if (thrownValue > 180) {
           alert('Cannot be greater than 180')
           return
         }
+        ev.target.thrownValue = thrownValue
+        applyPlayerScore(ev.target)
+      })
 
+      document.getElementById('threwTooMuchBtn').addEventListener('click', function(ev) {
+        ev.preventDefault();
+        let applyPlayerScoreBtn = document.getElementById('applyPlayerScoreBtn')
+        applyPlayerScoreBtn.thrownValue = 0
+        applyPlayerScore(applyPlayerScoreBtn)
+      })
+
+      document.getElementById('resetGameBtn').addEventListener('click', function(ev) {
+        ev.preventDefault();
+        let resetGame = confirm('Are you sure? You\'ll lose current progress!')
+
+        if(!resetGame) {
+          return
+        }
+
+        let applyBtn = document.getElementById('applyPlayerScoreBtn')
         let playersList = document.querySelector('.step3 ul').children
-        let currentPlayerIdx = parseInt(ev.target.getAttribute('data-player-idx'))
-        let currentPlayer = playersList[currentPlayerIdx].getElementsByTagName('input')[0]
 
+        for (let idx = 0; idx < playersList.length; idx++) {
+          let playerInput = playersList[idx].querySelector('input')
+          if(idx == 0) {
+            playerInput.classList.add('is-valid')
+          } else if (idx == parseInt(applyBtn.getAttribute('data-player-idx'))) {
+            playerInput.classList.remove('is-valid')
+          }
+          playerInput.value = getGameDurationLimit()
+        }
+
+        applyBtn.setAttribute('data-player-idx', 0)
+        initClickCountStorage()
+        insertEndGameRowToHistory()
+      })
+
+      document.getElementById('showHideHistory').addEventListener('click', function(ev) {
+        ev.preventDefault();
+        let tableHistoryWrapper = document.getElementsByClassName('table-history-wrapper')[0]
+
+        if (tableHistoryWrapper.classList.contains('hidden')) {
+          tableHistoryWrapper.classList.remove('hidden')
+          ev.target.textContent = 'Hide'
+        } else {
+          tableHistoryWrapper.classList.add('hidden')
+          ev.target.textContent = 'Show'
+        }
+      })
+
+      function applyPlayerScore(applyPlayerScoreBtn) {
+        let playersList = document.querySelector('.step3 ul').children
         let playersNumber = playersList.length
+
+        let thrownValue = applyPlayerScoreBtn.thrownValue
+        let currentPlayerIdx = parseInt(applyPlayerScoreBtn.getAttribute('data-player-idx'))
+        let currentPlayer = playersList[currentPlayerIdx].getElementsByTagName('input')[0]
         let currentPlayerValue = parseInt(currentPlayer.value)
 
-        if(currentPlayerValue - currentPlayerScore < 0) {
-          currentPlayerScore = 0
+        if(currentPlayerValue - thrownValue < 0) {
+          thrownValue = 0
           alert('Total cannot be less than 0')
-        } else if (currentPlayerValue - currentPlayerScore == 0) {
-          alert(`Congratulations! Current player threw 501! Done in ${localStorage.clickcount} laps!`)
+        } else if (currentPlayerValue - thrownValue == 0) {
+          alert(`Congratulations! Current player threw ${getGameDurationLimit()}! Done in ${localStorage.clickcount} laps!`)
         }
-        currentPlayer.value = currentPlayerValue - currentPlayerScore
-        addScoreToHistory(currentPlayerIdx, currentPlayerScore)
+        currentPlayer.value = currentPlayerValue - thrownValue
+        addScoreToHistory(currentPlayerIdx, thrownValue)
 
         if (0 < currentPlayer.value && currentPlayer.value < 75) {
           alert(`${currentPlayer.value} left to win!`)
@@ -213,37 +280,11 @@
           nextPlayerIdx = parseInt(nextPlayer.getAttribute('data-player-order'))
         }
 
-        ev.target.setAttribute('data-player-idx', nextPlayerIdx)
+        applyPlayerScoreBtn.setAttribute('data-player-idx', nextPlayerIdx)
         currentPlayer.classList.remove('is-valid')
         nextPlayer.classList.add('is-valid')
-        document.querySelector('.step3 input.player_score').value = 0
-      })
-
-      document.getElementById('resetGameBtn').addEventListener('click', function(ev) {
-        ev.preventDefault();
-        let resetGame = confirm('Are you sure? You\'ll lose current progress!')
-
-        if(!resetGame) {
-          return
-        }
-
-        let applyBtn = document.getElementById('applyPlayerScore')
-        let playersList = document.querySelector('.step3 ul').children
-
-        for (let idx = 0; idx < playersList.length; idx++) {
-          let playerInput = playersList[idx].querySelector('input')
-          if(idx == 0) {
-            playerInput.classList.add('is-valid')
-          } else if (idx == parseInt(applyBtn.getAttribute('data-player-idx'))) {
-            playerInput.classList.remove('is-valid')
-          }
-          playerInput.value = 501
-        }
-
-        applyBtn.setAttribute('data-player-idx', 0)
-        initClickCountStorage()
-        insertEndGameRowToHistory()
-      })
+        document.querySelector('.step3 input.thrown-value').value = 0
+      }
 
       function getNextPlayer(currentPlayerIdx, playersNumber) {
         let nextPlayerIdx = -1
@@ -282,6 +323,7 @@
           clonned.id = playerNamesList[idx].id
           clonnedInput.setAttribute('data-player-order', idx)
           clonnedInput.setAttribute('data-players-number', playersNumber - 1)
+          clonnedInput.value = getGameDurationLimit()
           clonned.querySelector('span.player_name').textContent = playerNamesList[idx].value
 
           if(idx == 0) {
@@ -317,10 +359,10 @@
         }
       }
 
-      function addScoreToHistory(playerIdx, playerScore) {
+      function addScoreToHistory(playerIdx, thrownValue) {
         let historyTable = document.querySelector('.step3 table.history')
         let historyCells = historyTable.querySelector('tbody').children[0].children
-        historyCells[playerIdx + 1].textContent = playerScore // +1 for lap number cell
+        historyCells[playerIdx + 1].textContent = thrownValue // +1 for lap number cell
       }
 
       function updateLapCounter(number = 0) {
@@ -366,6 +408,10 @@
         td.classList.add('table-secondary')
 
         insertHistoryRow(1)
+      }
+
+      function getGameDurationLimit() {
+        return parseInt(document.getElementById('gameDuration').value)
       }
 
       function hideElementByClassName(className) {
