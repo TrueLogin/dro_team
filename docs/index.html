@@ -97,13 +97,13 @@
         <div class="col-12 mt-2">
           <ul class="players_table list-group"></ul>
           <div class="score_input_field input-group mt-4">
-            <input class="form-control thrown-value" type="number" value="0" min=0 max=180 inputmode="numeric" pattern="[0-9]*" onfocus="this.value=''">
+            <input class="form-control thrown-value" type="tel" value="0" onfocus="this.value=''">
             <div class="input-group-append">
               <button id="applyPlayerScoreBtn" class="btn btn-success" data-player-idx="0" type="button">Apply!</button>
             </div>
           </div>
           <div class="mt-2 border border-dark rounded">
-            <button id="threwTooMuchBtn" type="button" class="btn btn-light btn-block">Threw too much!</button>
+            <button id="threwTooMuchBtn" type="button" class="btn btn-light btn-block">Too much!</button>
           </div>
         </div>
 
@@ -195,8 +195,8 @@
           return
         }
         thrownValue = parseInt(thrownValue)
-        if (thrownValue > 180) {
-          alert('Cannot be greater than 180')
+        if (thrownValue < 0 || thrownValue > 180) {
+          alert('Cannot be less than 0 and greater than 180')
           return
         }
         ev.target.thrownValue = thrownValue
@@ -262,10 +262,10 @@
           thrownValue = 0
           alert('Total cannot be less than 0')
         } else if (currentPlayerValue - thrownValue == 0) {
-          alert(`Congratulations! Current player threw ${getGameDurationLimit()}! Done in ${localStorage.clickcount} laps!`)
+          alert(`Congratulations! Current player threw ${getGameDurationLimit()}! Done in ${sessionStorage.clickcount} laps!`)
         }
         currentPlayer.value = currentPlayerValue - thrownValue
-        addScoreToHistory(currentPlayerIdx, thrownValue)
+        addScoreToHistory(currentPlayerIdx, currentPlayer.value, thrownValue)
 
         if (0 < currentPlayer.value && currentPlayer.value < 75) {
           alert(`${currentPlayer.value} left to win!`)
@@ -338,9 +338,9 @@
 
       function initClickCountStorage() {
         if(typeof(Storage) !== "undefined") {
-          localStorage.clickcount = 0;
+          sessionStorage.clickcount = 0;
 
-          updateLapCounter(localStorage.clickcount);
+          updateLapCounter(sessionStorage.clickcount);
         }
       }
 
@@ -359,21 +359,21 @@
         }
       }
 
-      function addScoreToHistory(playerIdx, thrownValue) {
+      function addScoreToHistory(playerIdx, newValueForCurrentPlayer, thrownValue) {
         let historyTable = document.querySelector('.step3 table.history')
         let historyCells = historyTable.querySelector('tbody').children[0].children
-        historyCells[playerIdx + 1].textContent = thrownValue // +1 for lap number cell
+        historyCells[playerIdx + 1].textContent = '' + newValueForCurrentPlayer + ' (' + thrownValue + ')' // +1 for lap number cell
       }
 
       function updateLapCounter(number = 0) {
-        if (localStorage.clickcount) {
-          localStorage.clickcount = Number(localStorage.clickcount)+1;
+        if (sessionStorage.clickcount) {
+          sessionStorage.clickcount = Number(sessionStorage.clickcount)+1;
         } else {
-          localStorage.clickcount = 1;
+          sessionStorage.clickcount = 1;
         }
-        document.getElementById('lapCounter').innerHTML = '(Lap: ' + localStorage.clickcount + ')';
-        if (Number(localStorage.clickcount) > 1) {
-          insertHistoryRow(localStorage.clickcount)
+        document.getElementById('lapCounter').innerHTML = '(Lap: ' + sessionStorage.clickcount + ')';
+        if (Number(sessionStorage.clickcount) > 1) {
+          insertHistoryRow(sessionStorage.clickcount)
         }
       }
 
